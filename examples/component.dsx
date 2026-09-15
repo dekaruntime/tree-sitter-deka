@@ -1,0 +1,19 @@
+// A representative DSX component.
+
+import { Counter } from "./Counter.dsx"
+
+fn greeting(name: string) string {
+  return "Hello, " + name + "."
+}
+
+export fn Page() ReactNode {
+  return (
+    <main class="page">
+      <section class="hero">
+        <h1>Deka App</h1>
+        <p>{greeting("World")}</p>
+        <Counter client:load />
+        <p class="hint">Save and see your changes right away</p>
+      </section>
+    </main>)
+}

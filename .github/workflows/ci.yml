@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Generate, test, and verify queries
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Set up tree-sitter CLI
+        uses: tree-sitter/setup-action/cli@v1
+
+      - name: Verify generated parser is up to date
+        run: |
+          npx tree-sitter generate
+          git diff --exit-code -- src/parser.c src/node-types.json src/grammar.json
+
+      - name: Run corpus tests
+        run: npx tree-sitter test
+
+      - name: Verify queries compile
+        run: |
+          npx tree-sitter query queries/highlights.scm test/corpus/declarations.txt > /dev/null
+          npx tree-sitter query queries/injections.scm test/corpus/declarations.txt > /dev/null
+          npx tree-sitter query queries/locals.scm test/corpus/declarations.txt > /dev/null
+          npx tree-sitter query queries/tags.scm test/corpus/declarations.txt > /dev/null
+
+      - name: Build Node binding
+        run: npm install --ignore-scripts && npx node-gyp rebuild
+
+      - name: Test Rust binding
+        run: cargo test
+
+  wasm:
+    name: Build WebAssembly parser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Set up tree-sitter CLI
+        uses: tree-sitter/setup-action/cli@v1
+
+      - name: Set up emscripten
+        uses: mymindstorm/setup-emsdk@v14
+
+      - name: Generate parser
+        run: npx tree-sitter generate
+
+      - name: Build wasm
+        run: npx tree-sitter build --wasm
+
+      - name: Upload wasm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tree-sitter-deka.wasm
+          path: tree-sitter-deka.wasm

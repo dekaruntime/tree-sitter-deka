@@ -1,0 +1,736 @@
+================================================================================
+DekaScript expressions
+================================================================================
+
+================================================================================
+match expression
+================================================================================
+
+const label = match (color) {
+  Red => "red",
+  Green => "green",
+  Blue => "blue",
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (identifier)
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (identifier)
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (identifier)
+          body: (string
+            (string_fragment)))))))
+
+================================================================================
+match with constructor patterns
+================================================================================
+
+const out = match (result) {
+  Ok(v) => v,
+  Err(e) => fallback,
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (constructor_pattern
+            name: (identifier)
+            payload: (identifier))
+          body: (identifier))
+        (match_arm
+          pattern: (constructor_pattern
+            name: (identifier)
+            payload: (identifier))
+          body: (identifier))))))
+
+================================================================================
+match with qualified constructor patterns
+================================================================================
+
+const name = match (color) {
+  Color.Red => "red",
+  Color.Blue => "blue",
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (constructor_pattern
+            enum: (identifier)
+            name: (identifier))
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (constructor_pattern
+            enum: (identifier)
+            name: (identifier))
+          body: (string
+            (string_fragment)))))))
+
+================================================================================
+match with or-patterns
+================================================================================
+
+const n = match (x) {
+  1 | 2 | 3 => "small",
+  _ => "big",
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (number)
+          pattern: (number)
+          pattern: (number)
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (wildcard_pattern)
+          body: (string
+            (string_fragment)))))))
+
+================================================================================
+match with struct patterns
+================================================================================
+
+const area = match (shape) {
+  Circle { radius } => radius * radius,
+  Square { side: s } => s,
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (struct_pattern
+            name: (identifier)
+            field: (identifier))
+          body: (binary_expression
+            left: (identifier)
+            right: (identifier)))
+        (match_arm
+          pattern: (struct_pattern
+            name: (identifier)
+            field: (identifier)
+            (identifier))
+          body: (identifier))))))
+
+================================================================================
+match with tuple patterns
+================================================================================
+
+const first = match (pair) {
+  (a, b) => a,
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (tuple_pattern
+            (identifier)
+            (identifier))
+          body: (identifier))))))
+
+================================================================================
+match with literal and wildcard patterns
+================================================================================
+
+const kind = match (n) {
+  0 => "zero",
+  "x" => "ex",
+  true => "yes",
+  None => "none",
+  _ => "other",
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (match_expression
+        value: (parenthesized_expression
+          (identifier))
+        (match_arm
+          pattern: (number)
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (string
+            (string_fragment))
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (true)
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (none)
+          body: (string
+            (string_fragment)))
+        (match_arm
+          pattern: (wildcard_pattern)
+          body: (string
+            (string_fragment)))))))
+
+================================================================================
+match as return value scrutinee on one line
+================================================================================
+
+return match (raw) {
+  Ok(v) => v,
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (return_statement
+    (match_expression
+      value: (parenthesized_expression
+        (identifier))
+      (match_arm
+        pattern: (constructor_pattern
+          name: (identifier)
+          payload: (identifier))
+        body: (identifier)))))
+
+================================================================================
+unsafe block with result type
+================================================================================
+
+const raw = await bridge fs.read_file(path)
+return match (unsafe<Result<bytes, string>> { raw }) {
+  Ok(v) => v,
+  Err(e) => Err(e),
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (await_expression
+        (bridge_expression
+          kind: (identifier)
+          action: (identifier)
+          arguments: (arguments
+            (identifier))))))
+  (return_statement
+    (match_expression
+      value: (parenthesized_expression
+        (unsafe_expression
+          type: (type_arguments
+            (generic_type
+              name: (type_identifier)
+              type_arguments: (type_arguments
+                (type_identifier)
+                (predefined_type))))
+          (raw_js)))
+      (match_arm
+        pattern: (constructor_pattern
+          name: (identifier)
+          payload: (identifier))
+        body: (identifier))
+      (match_arm
+        pattern: (constructor_pattern
+          name: (identifier)
+          payload: (identifier))
+        body: (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+unsafe block without result type
+================================================================================
+
+const _ = unsafe {
+  event.preventDefault()
+  return 1
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (unsafe_expression
+        (raw_js)))))
+
+================================================================================
+unsafe block with nested braces and strings
+================================================================================
+
+const _ = unsafe {
+  const config = { retries: 3, name: "a } b" }
+  if (config.retries > 0) { boot(config) }
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (unsafe_expression
+        (raw_js)))))
+
+================================================================================
+build expression
+================================================================================
+
+const routes = build {
+  const pages = discover()
+  return pages
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (build_expression
+        body: (statement_block
+          (lexical_declaration
+            (variable_declarator
+              name: (identifier)
+              value: (call_expression
+                function: (identifier)
+                arguments: (arguments))))
+          (return_statement
+            (identifier)))))))
+
+================================================================================
+bridge expression
+================================================================================
+
+const bytes = bridge crypto.random_bytes(32)
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (bridge_expression
+        kind: (identifier)
+        action: (identifier)
+        arguments: (arguments
+          (number))))))
+
+================================================================================
+struct literal
+================================================================================
+
+const post = Post { slug: "hello", title: "Hello", tags: ["a", "b"] }
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (struct_literal
+        name: (identifier)
+        field: (identifier)
+        value: (string
+          (string_fragment))
+        field: (identifier)
+        value: (string
+          (string_fragment))
+        field: (identifier)
+        value: (array
+          (string
+            (string_fragment))
+          (string
+            (string_fragment)))))))
+
+================================================================================
+nested struct literal
+================================================================================
+
+const point = Point { x: 1, y: Outer { inner: true } }
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (struct_literal
+        name: (identifier)
+        field: (identifier)
+        value: (number)
+        field: (identifier)
+        value: (struct_literal
+          name: (identifier)
+          field: (identifier)
+          value: (true))))))
+
+================================================================================
+unwrap binding with block alternative
+================================================================================
+
+const value = unwrap(maybe) or {
+  return defaultValue
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (unwrap_expression
+        value: (identifier)
+        alternative: (statement_block
+          (return_statement
+            (identifier)))))))
+
+================================================================================
+unwrap binding with match alternative
+================================================================================
+
+const value = unwrap(result) or match {
+  Some(v) => v,
+  None => fallback,
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (unwrap_expression
+        value: (identifier)
+        alternative: (match_body
+          (match_arm
+            pattern: (constructor_pattern
+              name: (identifier)
+              payload: (identifier))
+            body: (identifier))
+          (match_arm
+            pattern: (none)
+            body: (identifier)))))))
+
+================================================================================
+unwrap as an ordinary call stays a call
+================================================================================
+
+const x = unwrap(b)
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (call_expression
+        function: (identifier)
+        arguments: (arguments
+          (identifier))))))
+
+================================================================================
+fn expression
+================================================================================
+
+const double = fn (x: number) number {
+  return x * 2
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (fn_expression
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (predefined_type))))
+        return_type: (predefined_type)
+        body: (statement_block
+          (return_statement
+            (binary_expression
+              left: (identifier)
+              right: (number))))))))
+
+================================================================================
+async fn expression
+================================================================================
+
+const load = async fn (url: string) string {
+  return fetch(url)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (fn_expression
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (predefined_type))))
+        return_type: (predefined_type)
+        body: (statement_block
+          (return_statement
+            (call_expression
+              function: (identifier)
+              arguments: (arguments
+                (identifier)))))))))
+
+================================================================================
+fn expression without return type
+================================================================================
+
+run(fn (x) {
+  print(x)
+})
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (expression_statement
+    (call_expression
+      function: (identifier)
+      arguments: (arguments
+        (fn_expression
+          parameters: (formal_parameters
+            (required_parameter
+              pattern: (identifier)))
+          body: (statement_block
+            (expression_statement
+              (call_expression
+                function: (identifier)
+                arguments: (arguments
+                  (identifier))))))))))
+
+================================================================================
+None literal
+================================================================================
+
+const missing = None
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (none))))
+
+================================================================================
+pipe operator
+================================================================================
+
+const out = input |> trim |> uppercase
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (binary_expression
+        left: (binary_expression
+          left: (identifier)
+          right: (identifier))
+        right: (identifier)))))
+
+================================================================================
+binary operators
+================================================================================
+
+const ok = a > 1 && b < 2 || c == 3
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (binary_expression
+        left: (binary_expression
+          left: (binary_expression
+            left: (identifier)
+            right: (number))
+          right: (binary_expression
+            left: (identifier)
+            right: (number)))
+        right: (binary_expression
+          left: (identifier)
+          right: (number))))))
+
+================================================================================
+ternary
+================================================================================
+
+const label = count > 1 ? "many" : "one"
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (ternary_expression
+        condition: (binary_expression
+          left: (identifier)
+          right: (number))
+        consequence: (string
+          (string_fragment))
+        alternative: (string
+          (string_fragment))))))
+
+================================================================================
+await expression
+================================================================================
+
+const body = await fetch(url)
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (await_expression
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+template literal
+================================================================================
+
+const msg = `hello ${name}, you have ${count} messages`
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (template_string
+        (string_fragment)
+        (template_substitution
+          (identifier))
+        (string_fragment)
+        (template_substitution
+          (identifier))
+        (string_fragment)))))
+
+================================================================================
+array and object literals with spread
+================================================================================
+
+const next = [first, ...rest]
+const merged = { ...base, name: "new" }
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (array
+        (identifier)
+        (spread_element
+          (identifier)))))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (object
+        (spread_element
+          (identifier))
+        (pair
+          key: (property_identifier)
+          value: (string
+            (string_fragment)))))))
