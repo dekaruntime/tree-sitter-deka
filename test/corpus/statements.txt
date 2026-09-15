@@ -1,0 +1,334 @@
+================================================================================
+DekaScript statements
+================================================================================
+
+================================================================================
+import named bindings
+================================================================================
+
+import { read_file, write_file } from "@deka/fs"
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier))
+        (import_specifier
+          name: (identifier))))
+    source: (string
+      (string_fragment))))
+
+================================================================================
+import with alias
+================================================================================
+
+import { read_file as read } from "@deka/fs"
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (import_statement
+    (import_clause
+      (named_imports
+        (import_specifier
+          name: (identifier)
+          alias: (identifier))))
+    source: (string
+      (string_fragment))))
+
+================================================================================
+side-effect import
+================================================================================
+
+import "./polyfills.ds"
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (import_statement
+    source: (string
+      (string_fragment))))
+
+================================================================================
+export named group
+================================================================================
+
+export { FsPermission, FsError }
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier))
+      (export_specifier
+        name: (identifier)))))
+
+================================================================================
+export named group with source
+================================================================================
+
+export { echo } from "@deka/io"
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    (export_clause
+      (export_specifier
+        name: (identifier)))
+    source: (string
+      (string_fragment))))
+
+================================================================================
+export const
+================================================================================
+
+export const limit: number = 10
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (lexical_declaration
+      (variable_declarator
+        name: (identifier)
+        type: (type_annotation
+          (predefined_type))
+        value: (number)))))
+
+================================================================================
+const and let without semicolons
+================================================================================
+
+const a = 1
+let b: string = "two"
+const c: Array<number> = [1, 2, 3]
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (number)))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (predefined_type))
+      value: (string
+        (string_fragment))))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (generic_type
+          name: (type_identifier)
+          type_arguments: (type_arguments
+            (predefined_type))))
+      value: (array
+        (number)
+        (number)
+        (number)))))
+
+================================================================================
+const with explicit semicolons
+================================================================================
+
+const a = 1;
+const b = 2;
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (number)))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      value: (number))))
+
+================================================================================
+if else
+================================================================================
+
+if (ready) {
+  go()
+} else if (waiting) {
+  pause()
+} else {
+  stop()
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (if_statement
+    condition: (parenthesized_expression
+      (identifier))
+    consequence: (statement_block
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments))))
+    alternative: (else_clause
+      (if_statement
+        condition: (parenthesized_expression
+          (identifier))
+        consequence: (statement_block
+          (expression_statement
+            (call_expression
+              function: (identifier)
+              arguments: (arguments))))
+        alternative: (else_clause
+          (statement_block
+            (expression_statement
+              (call_expression
+                function: (identifier)
+                arguments: (arguments)))))))))
+
+================================================================================
+for of loop
+================================================================================
+
+for (const post of posts) {
+  render(post)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (statement_block
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+c-style for loop
+================================================================================
+
+for (let i = 0; i < count; i++) {
+  tick(i)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (for_statement
+    initializer: (lexical_declaration
+      (variable_declarator
+        name: (identifier)
+        value: (number)))
+    condition: (binary_expression
+      left: (identifier)
+      right: (identifier))
+    increment: (update_expression
+      argument: (identifier))
+    body: (statement_block
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+break and continue
+================================================================================
+
+for (const item of items) {
+  if (item.done) {
+    break
+  }
+  if (item.skip) {
+    continue
+  }
+  handle(item)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (for_in_statement
+    left: (identifier)
+    right: (identifier)
+    body: (statement_block
+      (if_statement
+        condition: (parenthesized_expression
+          (member_expression
+            object: (identifier)
+            property: (property_identifier)))
+        consequence: (statement_block
+          (break_statement)))
+      (if_statement
+        condition: (parenthesized_expression
+          (member_expression
+            object: (identifier)
+            property: (property_identifier)))
+        consequence: (statement_block
+          (continue_statement)))
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+return without value
+================================================================================
+
+fn stop() None {
+  return
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (fn_declaration
+    name: (identifier)
+    parameters: (formal_parameters)
+    return_type: (type_identifier)
+    body: (statement_block
+      (return_statement))))
+
+================================================================================
+labeled block is not required for ordinary blocks
+================================================================================
+
+{
+  const scoped = 1
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (statement_block
+    (lexical_declaration
+      (variable_declarator
+        name: (identifier)
+        value: (number)))))

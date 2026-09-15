@@ -1,0 +1,202 @@
+================================================================================
+DekaScript types
+================================================================================
+
+================================================================================
+generic type
+================================================================================
+
+const posts: Array<Post> = []
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (generic_type
+          name: (type_identifier)
+          type_arguments: (type_arguments
+            (type_identifier))))
+      value: (array))))
+
+================================================================================
+nested generic type arguments
+================================================================================
+
+const cache: Map<string, Array<number>> = new_cache
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (generic_type
+          name: (type_identifier)
+          type_arguments: (type_arguments
+            (predefined_type)
+            (generic_type
+              name: (type_identifier)
+              type_arguments: (type_arguments
+                (predefined_type))))))
+      value: (identifier))))
+
+================================================================================
+union type
+================================================================================
+
+const value: string | None = None
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (union_type
+          (predefined_type)
+          (type_identifier)))
+      value: (none))))
+
+================================================================================
+option type postfix
+================================================================================
+
+const name: string? = None
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (option_type
+          (predefined_type)))
+      value: (none))))
+
+================================================================================
+fn type
+================================================================================
+
+const handler: fn(Event) Result<None, string> = default_handler
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (deka_function_type
+          parameters: (formal_parameters
+            (required_parameter
+              pattern: (identifier)))
+          return_type: (generic_type
+            name: (type_identifier)
+            type_arguments: (type_arguments
+              (type_identifier)
+              (predefined_type)))))
+      value: (identifier))))
+
+================================================================================
+fn type with void return
+================================================================================
+
+interface Hooks {
+  beforeEach: Array<fn() void>
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (interface_declaration
+    name: (type_identifier)
+    body: (interface_body
+      (interface_field
+        name: (property_identifier)
+        type: (generic_type
+          name: (type_identifier)
+          type_arguments: (type_arguments
+            (deka_function_type
+              parameters: (formal_parameters)
+              return_type: (predefined_type))))))))
+
+================================================================================
+type parameters with bounds
+================================================================================
+
+fn merge<T: Named | Comparable>(a: T, b: T) T {
+  return a
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (fn_declaration
+    name: (identifier)
+    type_parameters: (type_parameters
+      (type_parameter
+        name: (type_identifier)
+        constraint: (constraint
+          (union_type
+            (type_identifier)
+            (type_identifier)))))
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (type_identifier)))
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (type_identifier))))
+    return_type: (type_identifier)
+    body: (statement_block
+      (return_statement
+        (identifier)))))
+
+================================================================================
+predefined types
+================================================================================
+
+const n: number = 1
+const s: string = "x"
+const v: void = work()
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (predefined_type))
+      value: (number)))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (predefined_type))
+      value: (string
+        (string_fragment))))
+  (lexical_declaration
+    (variable_declarator
+      name: (identifier)
+      type: (type_annotation
+        (predefined_type))
+      value: (call_expression
+        function: (identifier)
+        arguments: (arguments)))))

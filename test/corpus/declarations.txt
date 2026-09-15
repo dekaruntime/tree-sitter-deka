@@ -1,0 +1,538 @@
+================================================================================
+DekaScript declarations
+================================================================================
+
+================================================================================
+fn declaration with return type
+================================================================================
+
+fn add(a: number, b: number) number {
+  return a + b
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (fn_declaration
+    name: (identifier)
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (predefined_type)))
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (predefined_type))))
+    return_type: (predefined_type)
+    body: (statement_block
+      (return_statement
+        (binary_expression
+          left: (identifier)
+          right: (identifier))))))
+
+================================================================================
+async fn declaration
+================================================================================
+
+async fn fetch(url: string) Promise<string> {
+  return load(url)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (fn_declaration
+    name: (identifier)
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (predefined_type))))
+    return_type: (generic_type
+      name: (type_identifier)
+      type_arguments: (type_arguments
+        (predefined_type)))
+    body: (statement_block
+      (return_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+export fn declaration
+================================================================================
+
+export fn main() void {
+  run()
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters)
+      return_type: (predefined_type)
+      body: (statement_block
+        (expression_statement
+          (call_expression
+            function: (identifier)
+            arguments: (arguments)))))))
+
+================================================================================
+export async fn declaration
+================================================================================
+
+export async fn read(path: string) Result<bytes, string> {
+  return Ok(read_file(path))
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters
+        (required_parameter
+          pattern: (identifier)
+          type: (type_annotation
+            (predefined_type))))
+      return_type: (generic_type
+        name: (type_identifier)
+        type_arguments: (type_arguments
+          (type_identifier)
+          (predefined_type)))
+      body: (statement_block
+        (return_statement
+          (call_expression
+            function: (identifier)
+            arguments: (arguments
+              (call_expression
+                function: (identifier)
+                arguments: (arguments
+                  (identifier))))))))))
+
+================================================================================
+generic fn declaration with bounds
+================================================================================
+
+fn identity<T: Named>(value: T) T {
+  return value
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (fn_declaration
+    name: (identifier)
+    type_parameters: (type_parameters
+      (type_parameter
+        name: (type_identifier)
+        constraint: (constraint
+          (type_identifier))))
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (type_identifier))))
+    return_type: (type_identifier)
+    body: (statement_block
+      (return_statement
+        (identifier)))))
+
+================================================================================
+fn declaration without return type
+================================================================================
+
+fn log(message: string) {
+  print(message)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (fn_declaration
+    name: (identifier)
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (predefined_type))))
+    body: (statement_block
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (identifier)))))))
+
+================================================================================
+receiver method declaration
+================================================================================
+
+fn (s Signal<T>) get() T {
+  return s.value
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (receiver_method_declaration
+    receiver_name: (identifier)
+    receiver_type: (type_identifier)
+    receiver_type_arguments: (type_parameters
+      (type_parameter
+        name: (type_identifier)))
+    name: (identifier)
+    parameters: (formal_parameters)
+    return_type: (type_identifier)
+    body: (statement_block
+      (return_statement
+        (member_expression
+          object: (identifier)
+          property: (property_identifier))))))
+
+================================================================================
+receiver method with mutable receiver
+================================================================================
+
+fn (s mut Signal) set(value: string) Result<None, string> {
+  return Ok(None)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (receiver_method_declaration
+    receiver_name: (identifier)
+    receiver_type: (type_identifier)
+    name: (identifier)
+    parameters: (formal_parameters
+      (required_parameter
+        pattern: (identifier)
+        type: (type_annotation
+          (predefined_type))))
+    return_type: (generic_type
+      name: (type_identifier)
+      type_arguments: (type_arguments
+        (type_identifier)
+        (predefined_type)))
+    body: (statement_block
+      (return_statement
+        (call_expression
+          function: (identifier)
+          arguments: (arguments
+            (none)))))))
+
+================================================================================
+struct declaration
+================================================================================
+
+struct Point {
+  x: number
+  y: number
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (struct_declaration
+    name: (type_identifier)
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type))
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type))))
+
+================================================================================
+struct with optional fields and defaults
+================================================================================
+
+struct Config {
+  name: string
+  retries?: number = 3
+  enabled: boolean = true
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (struct_declaration
+    name: (type_identifier)
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type))
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type)
+      default: (number))
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type)
+      default: (true))))
+
+================================================================================
+struct with embedded struct
+================================================================================
+
+struct Outer {
+  Inner
+  extra: string
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (struct_declaration
+    name: (type_identifier)
+    (struct_embed
+      name: (type_identifier))
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type))))
+
+================================================================================
+super struct
+================================================================================
+
+super struct User {
+  id: number
+  name: string
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (struct_declaration
+    name: (type_identifier)
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type))
+    (struct_field
+      name: (property_identifier)
+      type: (predefined_type))))
+
+================================================================================
+enum with payloads
+================================================================================
+
+enum FsError {
+  PermissionDenied(FsPermission),
+  UnsupportedHost,
+  InvalidPayload,
+  Failed(string),
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (enum_declaration
+    name: (type_identifier)
+    (enum_case
+      name: (identifier)
+      payload: (type_identifier))
+    (enum_case
+      name: (identifier))
+    (enum_case
+      name: (identifier))
+    (enum_case
+      name: (identifier)
+      payload: (predefined_type))))
+
+================================================================================
+enum with space-separated cases
+================================================================================
+
+enum Color { Red Green Blue }
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (enum_declaration
+    name: (type_identifier)
+    (enum_case
+      name: (identifier))
+    (enum_case
+      name: (identifier))
+    (enum_case
+      name: (identifier))))
+
+================================================================================
+super enum
+================================================================================
+
+super enum Shape {
+  Circle(number)
+  Square
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (enum_declaration
+    name: (type_identifier)
+    (enum_case
+      name: (identifier)
+      payload: (predefined_type))
+    (enum_case
+      name: (identifier))))
+
+================================================================================
+interface with fields
+================================================================================
+
+interface DirEntry {
+  name: string
+  is_dir: boolean
+  is_file: boolean
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (interface_declaration
+    name: (type_identifier)
+    body: (interface_body
+      (interface_field
+        name: (property_identifier)
+        type: (predefined_type))
+      (interface_field
+        name: (property_identifier)
+        type: (predefined_type))
+      (interface_field
+        name: (property_identifier)
+        type: (predefined_type)))))
+
+================================================================================
+interface with method signatures
+================================================================================
+
+interface Store {
+  fn get(key: string) string
+  fn set(key: string, value: string) Result<None, string>
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (interface_declaration
+    name: (type_identifier)
+    body: (interface_body
+      (interface_method_signature
+        name: (property_identifier)
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (predefined_type))))
+        return_type: (predefined_type))
+      (interface_method_signature
+        name: (property_identifier)
+        parameters: (formal_parameters
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (predefined_type)))
+          (required_parameter
+            pattern: (identifier)
+            type: (type_annotation
+              (predefined_type))))
+        return_type: (generic_type
+          name: (type_identifier)
+          type_arguments: (type_arguments
+            (type_identifier)
+            (predefined_type)))))))
+
+================================================================================
+interface with mutable fields
+================================================================================
+
+interface Counter {
+  mut count: number
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (interface_declaration
+    name: (type_identifier)
+    body: (interface_body
+      (interface_field
+        name: (property_identifier)
+        type: (predefined_type)))))
+
+================================================================================
+alias declaration
+================================================================================
+
+alias Handler = fn(Event) Result<None, string>
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (deka_function_type
+      parameters: (formal_parameters
+        (required_parameter
+          pattern: (identifier)))
+      return_type: (generic_type
+        name: (type_identifier)
+        type_arguments: (type_arguments
+          (type_identifier)
+          (predefined_type))))))
+
+================================================================================
+deprecated type alias
+================================================================================
+
+type OldHandler = fn(Event) None
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_alias_declaration
+    name: (type_identifier)
+    value: (deka_function_type
+      parameters: (formal_parameters
+        (required_parameter
+          pattern: (identifier)))
+      return_type: (type_identifier))))
+
+================================================================================
+newtype declaration
+================================================================================
+
+type UserId number
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (type_alias_declaration
+    name: (type_identifier)
+    representation: (type_identifier)))

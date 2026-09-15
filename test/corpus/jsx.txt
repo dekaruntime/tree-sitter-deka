@@ -1,0 +1,196 @@
+================================================================================
+DSX (JSX) in .dsx files
+================================================================================
+
+================================================================================
+component with JSX return
+================================================================================
+
+export fn Page() ReactNode {
+  return (
+    <main class="page">
+      <h1>Hello</h1>
+    </main>)
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters)
+      return_type: (type_identifier)
+      body: (statement_block
+        (return_statement
+          (parenthesized_expression
+            (jsx_element
+              open_tag: (jsx_opening_element
+                name: (identifier)
+                attribute: (jsx_attribute
+                  (property_identifier)
+                  (string
+                    (string_fragment))))
+              (jsx_element
+                open_tag: (jsx_opening_element
+                  name: (identifier))
+                (jsx_text)
+                close_tag: (jsx_closing_element
+                  name: (identifier)))
+              close_tag: (jsx_closing_element
+                name: (identifier)))))))))
+
+================================================================================
+self-closing element with namespaced attribute
+================================================================================
+
+export fn Home() ReactNode {
+  return <Counter client:load />
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters)
+      return_type: (type_identifier)
+      body: (statement_block
+        (return_statement
+          (jsx_self_closing_element
+            name: (identifier)
+            attribute: (jsx_attribute
+              (jsx_namespace_name
+                (identifier)
+                (identifier)))))))))
+
+================================================================================
+jsx with embedded expressions
+================================================================================
+
+export fn Item(props: ItemProps) ReactNode {
+  return <li class={props.active ? "on" : "off"}>{props.title}</li>
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters
+        (required_parameter
+          pattern: (identifier)
+          type: (type_annotation
+            (type_identifier))))
+      return_type: (type_identifier)
+      body: (statement_block
+        (return_statement
+          (jsx_element
+            open_tag: (jsx_opening_element
+              name: (identifier)
+              attribute: (jsx_attribute
+                (property_identifier)
+                (jsx_expression
+                  (ternary_expression
+                    condition: (member_expression
+                      object: (identifier)
+                      property: (property_identifier))
+                    consequence: (string
+                      (string_fragment))
+                    alternative: (string
+                      (string_fragment))))))
+            (jsx_expression
+              (member_expression
+                object: (identifier)
+                property: (property_identifier)))
+            close_tag: (jsx_closing_element
+              name: (identifier))))))))
+
+================================================================================
+jsx fragment
+================================================================================
+
+export fn List() ReactNode {
+  return <>
+    <li>a</li>
+    <li>b</li>
+  </>
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters)
+      return_type: (type_identifier)
+      body: (statement_block
+        (return_statement
+          (jsx_element
+            open_tag: (jsx_opening_element)
+            (jsx_element
+              open_tag: (jsx_opening_element
+                name: (identifier))
+              (jsx_text)
+              close_tag: (jsx_closing_element
+                name: (identifier)))
+            (jsx_element
+              open_tag: (jsx_opening_element
+                name: (identifier))
+              (jsx_text)
+              close_tag: (jsx_closing_element
+                name: (identifier)))
+            close_tag: (jsx_closing_element)))))))
+
+================================================================================
+event handler with fn expression
+================================================================================
+
+export fn Form() ReactNode {
+  return <form onSubmit={fn (event: Any) void {
+    const _ = unsafe {
+      event.preventDefault()
+    }
+  }}>Send</form>
+}
+
+
+--------------------------------------------------------------------------------
+
+(program
+  (export_statement
+    declaration: (fn_declaration
+      name: (identifier)
+      parameters: (formal_parameters)
+      return_type: (type_identifier)
+      body: (statement_block
+        (return_statement
+          (jsx_element
+            open_tag: (jsx_opening_element
+              name: (identifier)
+              attribute: (jsx_attribute
+                (property_identifier)
+                (jsx_expression
+                  (fn_expression
+                    parameters: (formal_parameters
+                      (required_parameter
+                        pattern: (identifier)
+                        type: (type_annotation
+                          (type_identifier))))
+                    return_type: (predefined_type)
+                    body: (statement_block
+                      (lexical_declaration
+                        (variable_declarator
+                          name: (identifier)
+                          value: (unsafe_expression
+                            (raw_js)))))))))
+            (jsx_text)
+            close_tag: (jsx_closing_element
+              name: (identifier))))))))

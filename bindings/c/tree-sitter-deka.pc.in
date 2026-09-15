@@ -1,0 +1,11 @@
+prefix=@PREFIX@
+libdir=@LIBDIR@
+includedir=@INCLUDEDIR@
+
+Name: tree-sitter-deka
+Description: DekaScript (.ds, .dsx) grammar for tree-sitter
+URL: https://github.com/dekaruntime/tree-sitter-deka
+Version: @VERSION@
+Requires: @REQUIRES@
+Libs: -L${libdir} @ADDITIONAL_LIBS@ -ltree-sitter-deka
+Cflags: -I${includedir}

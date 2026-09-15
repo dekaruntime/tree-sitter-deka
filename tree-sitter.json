@@ -1,0 +1,41 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "deka",
+      "camelcase": "Deka",
+      "scope": "source.deka",
+      "path": ".",
+      "external-files": [
+        "scanner/scanner.h"
+      ],
+      "file-types": [
+        "ds",
+        "dsx"
+      ],
+      "highlights": [
+        "queries/highlights.scm"
+      ],
+      "injections": "queries/injections.scm",
+      "locals": "queries/locals.scm",
+      "tags": "queries/tags.scm",
+      "injection-regex": "^(ds|dsx|deka(script)?)$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for DekaScript (.ds, .dsx)",
+    "links": {
+      "repository": "https://github.com/dekaruntime/tree-sitter-deka"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": false,
+    "node": true,
+    "python": false,
+    "rust": true,
+    "swift": false
+  }
+}

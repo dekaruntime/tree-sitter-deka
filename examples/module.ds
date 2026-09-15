@@ -1,0 +1,29 @@
+// A representative DekaScript module (the @deka/fs shape).
+
+interface DirEntry {
+  name: string
+  is_dir: boolean
+  is_file: boolean
+}
+
+enum FsError {
+  PermissionDenied(Permission),
+  UnsupportedHost,
+  Failed(string),
+}
+
+export async fn read_file(path: string) Promise<Result<bytes, FsError>> {
+  const raw = await bridge fs.read_file(path)
+  return match (unsafe<Result<bytes, FsError>> { raw }) {
+    Ok(v) => v,
+    Err(e) => Err(FsError.Failed("read_file: cast failed")),
+  }
+}
+
+export fn describe(entry: DirEntry) string {
+  const kind = match (entry) {
+    DirEntry { is_dir } => "dir",
+    _ => "file",
+  }
+  return `${entry.name} (${kind})`
+}

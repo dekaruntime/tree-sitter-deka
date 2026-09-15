@@ -1,0 +1,57 @@
+{
+  "name": "tree-sitter-deka",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for DekaScript (.ds, .dsx)",
+  "main": "bindings/node",
+  "types": "bindings/node",
+  "keywords": [
+    "tree-sitter",
+    "deka",
+    "dekascript",
+    "dsx",
+    "parser",
+    "grammar"
+  ],
+  "files": [
+    "grammar.js",
+    "binding.gyp",
+    "bindings/node/*",
+    "queries/*",
+    "scanner/scanner.h",
+    "src/*",
+    "tree-sitter.json"
+  ],
+  "dependencies": {
+    "node-addon-api": "^8.2.2",
+    "node-gyp-build": "^4.8.2",
+    "tree-sitter-javascript": "0.23.1"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.27.0"
+  },
+  "peerDependencies": {
+    "tree-sitter": "^0.21.0"
+  },
+  "peerDependenciesMeta": {
+    "tree-sitter": {
+      "optional": true
+    }
+  },
+  "scripts": {
+    "install": "node-gyp-build",
+    "build": "tree-sitter generate --no-bindings && node-gyp-build",
+    "prestart": "tree-sitter generate --no-bindings && node-gyp-build",
+    "start": "tree-sitter playground",
+    "test": "tree-sitter test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dekaruntime/tree-sitter-deka.git"
+  },
+  "author": "dekaruntime",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dekaruntime/tree-sitter-deka/issues"
+  },
+  "homepage": "https://github.com/dekaruntime/tree-sitter-deka#readme"
+}
