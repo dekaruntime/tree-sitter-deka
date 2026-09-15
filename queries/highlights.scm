@@ -302,3 +302,19 @@
   "type"
   "unsafe"
 ] @keyword
+
+; JSX
+;-----
+; Ported from tree-sitter-javascript's queries/highlights-jsx.scm. Kept
+; at the end of the file: where several patterns capture the same node,
+; tree-sitter gives precedence to the pattern listed later, so these
+; must follow the generic variable/property/operator patterns above.
+
+(jsx_opening_element (identifier) @tag (#match? @tag "^[a-z][^.]*$"))
+(jsx_closing_element (identifier) @tag (#match? @tag "^[a-z][^.]*$"))
+(jsx_self_closing_element (identifier) @tag (#match? @tag "^[a-z][^.]*$"))
+
+(jsx_attribute (property_identifier) @attribute)
+(jsx_opening_element (["<" ">"]) @punctuation.bracket)
+(jsx_closing_element (["</" ">"]) @punctuation.bracket)
+(jsx_self_closing_element (["<" "/>"]) @punctuation.bracket)
